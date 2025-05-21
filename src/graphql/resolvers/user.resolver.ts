@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import { generateToken } from '../../utils/jwt.utils';
 import { RegisterInput } from '../../types/user.types';
 import { AuthenticationError, ValidationError } from '../../utils/error.utils';
+import { validateRegisterInput } from '../../utils/validation.utils';
 
 const prisma = new PrismaClient();
 
@@ -13,6 +14,7 @@ export const userResolvers = {
      */
     register: async (_: any, { input }: { input: RegisterInput }) => {
       try {
+        validateRegisterInput(input);
         console.log('[register] Input:', input);
 
         // 1. Check if a user already exists with the provided email

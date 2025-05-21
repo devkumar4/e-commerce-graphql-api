@@ -5,9 +5,9 @@ import { GraphQLScalarType, Kind } from 'graphql';
 
 // We'll import our resolver modules here when they're created
 import {userResolvers} from './user.resolver';
-// import productResolvers from './product.resolver';
-// import categoryResolvers from './category.resolver';
-// import orderResolvers from './order.resolver';
+import { categoryResolvers } from './category.resolver';
+import { productResolvers } from './product.resolver';
+import { orderResolvers } from './order.resolver';
 
 // Define scalar resolvers
 const dateTimeScalar = new GraphQLScalarType({
@@ -54,7 +54,7 @@ const baseResolvers = {
 export const resolvers = [
   baseResolvers,
   userResolvers,
-  // productResolvers,
-  // categoryResolvers,
-  // orderResolvers,
+  productResolvers,
+  categoryResolvers,
+  orderResolvers,
 ];

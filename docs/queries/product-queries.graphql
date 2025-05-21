@@ -1,0 +1,22 @@
+query {
+  products {
+    id
+    name
+    price
+    inventory
+    category { id name }
+  }
+}
+
+mutation {
+  createProduct(input: {
+    name: "Sample"
+    description: "Sample desc"
+    price: 100
+    inventory: 10
+    categoryId: "<category-id>"
+  }) {
+    id
+    name
+  }
+}

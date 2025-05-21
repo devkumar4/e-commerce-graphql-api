@@ -2,9 +2,9 @@
 
 // We'll import our type definitions here when they're created
 import { userTypeDefs } from './user.schema';
-// import productSchema from './product.schema';
-// import categorySchema from './category.schema';
-// import orderSchema from './order.schema';
+import { categoryTypeDefs } from './category.schema';
+import { productTypeDefs } from './product.schema';
+import { orderTypeDefs } from './order.schema';
 
 // Base schema with common types and scalar definitions
 const baseSchema = `#graphql
@@ -27,7 +27,7 @@ const baseSchema = `#graphql
 export const typeDefs = [
   baseSchema,
   userTypeDefs,
-  // productSchema,
-  // categorySchema,
-  // orderSchema,
+  productTypeDefs,
+  categoryTypeDefs,
+  orderTypeDefs,
 ];
