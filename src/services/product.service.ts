@@ -70,12 +70,24 @@ export async function updateProduct(
 }
 
 export async function deleteProduct(id: string, prisma: PrismaClient) {
-  const product = await prisma.product.findUnique({ where: { id } });
+  const product = await prisma.product.findUnique({
+    where: { id },
+    include: { orderItems: true },
+  });
+
   if (!product) throw new NotFoundError('Product', id);
+
+  if (product.orderItems.length > 0) {
+    throw new ValidationError(
+      'Cannot delete product that is referenced in orders',
+      { product: 'Product is referenced in orders' }
+    );
+  }
 
   await prisma.product.delete({ where: { id } });
   return true;
 }
+
 
 export function validateProductInput(input: {
   name: string;

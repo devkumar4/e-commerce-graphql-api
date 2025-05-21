@@ -9,6 +9,9 @@ import { commonTypeDefs } from './common.schema';
 
 // Base schema with common types and scalar definitions
 const baseSchema = `#graphql
+  # Define the auth directive
+  directive @auth on FIELD_DEFINITION
+
   # Custom scalars
   scalar DateTime
   

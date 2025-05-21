@@ -26,71 +26,72 @@ export async function getOrderById(id: string) {
 }
 
 export async function createOrder(userId: string, input: OrderInput) {
-  let totalAmount = 0;
+  return prisma.$transaction(async (tx) => {
+    let totalAmount = 0;
 
-  for (const item of input.items) {
-    const product = await prisma.product.findUnique({
-      where: { id: item.productId },
-    });
-    if (!product) throw new NotFoundError('Product', item.productId);
-    if (product.inventory < item.quantity) {
-      throw new ValidationError(
-        `Insufficient inventory for product ${product.name}`,
-        {
-          productId: item.productId,
+    // Validate and prepare items with unit price
+    const itemsWithPrice = await Promise.all(
+      input.items.map(async (item) => {
+        const product = await tx.product.findUnique({
+          where: { id: item.productId },
+        });
+
+        if (!product) throw new NotFoundError('Product', item.productId);
+
+        if (product.inventory < item.quantity) {
+          throw new ValidationError(
+            `Insufficient inventory for product ${product.name}`,
+            { productId: item.productId }
+          );
         }
-      );
-    }
-    totalAmount += Number(product.price) * item.quantity;
-  }
 
-  const order = await prisma.$transaction(async (tx) => {
+        const unitPrice = Number(product.price);
+        totalAmount += unitPrice * item.quantity;
+
+        return {
+          productId: item.productId,
+          quantity: item.quantity,
+          unitPrice,
+        };
+      })
+    );
+
+    // Create the order with all items (including unitPrice)
     const createdOrder = await tx.order.create({
       data: {
         userId,
         status: ORDER_STATUS.PENDING,
         totalAmount,
         items: {
-          create: input.items.map((item) => ({
+          create: itemsWithPrice.map((item) => ({
             productId: item.productId,
             quantity: item.quantity,
-            unitPrice: 0,
+            unitPrice: item.unitPrice,
           })),
         },
       },
-      include: { items: true },
-    });
-
-    for (const item of createdOrder.items) {
-      const product = await tx.product.findUnique({
-        where: { id: item.productId },
-      });
-
-      await tx.orderItem.update({
-        where: { id: item.id },
-        data: { unitPrice: product?.price },
-      });
-
-      await tx.product.update({
-        where: { id: item.productId },
-        data: {
-          inventory: {
-            decrement: item.quantity,
-          },
-        },
-      });
-    }
-
-    return tx.order.findUnique({
-      where: { id: createdOrder.id },
       include: {
         items: { include: { product: true } },
         user: true,
       },
     });
-  });
 
-  return order;
+    // Decrement product inventory
+    await Promise.all(
+      itemsWithPrice.map((item) =>
+        tx.product.update({
+          where: { id: item.productId },
+          data: {
+            inventory: {
+              decrement: item.quantity,
+            },
+          },
+        })
+      )
+    );
+
+    return createdOrder;
+  });
 }
 
 export async function updateOrderStatus(id: string, status: OrderStatusType) {
