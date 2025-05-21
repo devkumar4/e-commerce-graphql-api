@@ -4,7 +4,7 @@
 import { GraphQLScalarType, Kind } from 'graphql';
 
 // We'll import our resolver modules here when they're created
-// import userResolvers from './user.resolver';
+import {userResolvers} from './user.resolver';
 // import productResolvers from './product.resolver';
 // import categoryResolvers from './category.resolver';
 // import orderResolvers from './order.resolver';
@@ -53,7 +53,7 @@ const baseResolvers = {
 // Combine all resolvers
 export const resolvers = [
   baseResolvers,
-  // userResolvers,
+  userResolvers,
   // productResolvers,
   // categoryResolvers,
   // orderResolvers,

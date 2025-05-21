@@ -1,7 +1,7 @@
 // This file will combine all GraphQL type definitions
 
 // We'll import our type definitions here when they're created
-// import userSchema from './user.schema';
+import { userTypeDefs } from './user.schema';
 // import productSchema from './product.schema';
 // import categorySchema from './category.schema';
 // import orderSchema from './order.schema';
@@ -26,7 +26,7 @@ const baseSchema = `#graphql
 // For now, we only have the base schema
 export const typeDefs = [
   baseSchema,
-  // userSchema,
+  userTypeDefs,
   // productSchema,
   // categorySchema,
   // orderSchema,

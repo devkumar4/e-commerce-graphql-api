@@ -11,7 +11,7 @@ import cors from 'cors';
 import { json } from 'body-parser';
 
 // Import configuration
-import { apolloOptions, apolloLoggingPlugin, corsOptions, serverConfig } from './config';
+import { apolloLoggingPlugin, corsOptions, serverConfig } from './config';
 import { testConnection, disconnect } from './config/database';
 
 // Import GraphQL schema and resolvers (will be populated in next features)
@@ -33,7 +33,6 @@ async function startServer() {
 
   // Create Apollo Server instance
   const server = new ApolloServer({
-    ...apolloOptions,
     typeDefs,
     resolvers,
     plugins: [

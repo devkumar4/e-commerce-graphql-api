@@ -1,8 +1,6 @@
 import jwt from 'jsonwebtoken';
-import { jwtConfig } from '../config/auth';
-import { AuthUser } from '../graphql/context';
+import { AuthUser } from '../types/context.types';
 
-// Define the JWT payload structure
 interface JwtPayload {
   userId: string;
   email: string;
@@ -10,41 +8,42 @@ interface JwtPayload {
 }
 
 /**
- * Generate a JWT token for a user
- * @param user User information to encode in token
+ * Generate a JWT token with a 24-hour expiry
+ * @param user - Contains user ID, email, and role
  * @returns Signed JWT token
  */
 export const generateToken = (user: { id: string; email: string; role: string }): string => {
   return jwt.sign(
-    { 
-      userId: user.id, 
-      email: user.email, 
-      role: user.role 
+    {
+      userId: user.id,
+      email: user.email,
+      role: user.role
     },
-    jwtConfig.secret,
-    { 
-      expiresIn: jwtConfig.expiresIn,
-      algorithm: jwtConfig.algorithm,
-      issuer: jwtConfig.issuer
+    process.env.JWT_SECRET as string,
+    {
+      expiresIn: '24h'
     }
   );
 };
 
 /**
- * Verify and decode a JWT token
- * @param token JWT token to verify
- * @returns Decoded user information or null if invalid
+ * Verifies and decodes a JWT token
+ * @param token - JWT token string
+ * @returns Decoded user data or null if invalid
  */
 export const verifyToken = (token: string): AuthUser | null => {
   try {
-    const decoded = jwt.verify(token, jwtConfig.secret) as JwtPayload;
-    
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET as string
+    ) as JwtPayload;
+
     return {
       userId: decoded.userId,
       email: decoded.email,
       role: decoded.role as 'ADMIN' | 'CUSTOMER'
     };
-  } catch (error) {
-    return null;
+  } catch {
+    return null; // Invalid token
   }
 };
