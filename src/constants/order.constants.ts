@@ -3,7 +3,7 @@ export const ORDER_STATUS = {
   PROCESSING: 'PROCESSING',
   SHIPPED: 'SHIPPED',
   DELIVERED: 'DELIVERED',
-  CANCELLED: 'CANCELLED'
+  CANCELLED: 'CANCELLED',
 } as const;
 
-export type OrderStatusType = typeof ORDER_STATUS[keyof typeof ORDER_STATUS];
+export type OrderStatusType = (typeof ORDER_STATUS)[keyof typeof ORDER_STATUS];

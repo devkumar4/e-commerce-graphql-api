@@ -20,13 +20,17 @@ export interface GraphQLContext {
 }
 
 // Create context for each request
-export const createContext = async ({ req }: { req: Request }): Promise<GraphQLContext> => {
+export const createContext = async ({
+  req,
+}: {
+  req: Request;
+}): Promise<GraphQLContext> => {
   // Initialize with request and Prisma client
   const context: GraphQLContext = {
     prisma,
     req,
   };
-  
+
   // Extract token from Authorization header
   const authHeader = req.headers.authorization;
   if (authHeader) {
@@ -42,7 +46,7 @@ export const createContext = async ({ req }: { req: Request }): Promise<GraphQLC
       console.error('Authentication error:', error);
     }
   }
-  
+
   return context;
 };
 

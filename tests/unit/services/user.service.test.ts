@@ -1,4 +1,4 @@
-// Example unit test for a user service function
+
 import { comparePassword, hashPassword } from '../../../src/utils/password.utils';
 
 describe('userService', () => {
@@ -6,7 +6,7 @@ describe('userService', () => {
     const password = 'TestPassword123!';
     const hash = await hashPassword(password);
     expect(hash).not.toBe(password);
-    expect(hash).toMatch(/^\$2[aby]\$.{56}$/); // bcrypt hash format
+    expect(hash).toMatch(/^\$2[aby]\$.{56}$/); 
   });
 
   it('should validate password correctly', async () => {

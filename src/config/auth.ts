@@ -15,7 +15,7 @@ export const passwordHashConfig = {
 
 // Defined user roles with escalating privileges
 export const roles = {
-  ADMIN: 'ADMIN',     // Full control
+  ADMIN: 'ADMIN', // Full control
   CUSTOMER: 'CUSTOMER', // Restricted permissions
 };
 

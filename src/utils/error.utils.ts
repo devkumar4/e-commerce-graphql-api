@@ -1,10 +1,14 @@
-import { ERROR_MESSAGES } from "../constants/error.constants"
+import { ERROR_MESSAGES } from '../constants/error.constants';
 
 export class BaseError extends Error {
   code: string;
   additionalInfo: Record<string, any>;
 
-  constructor(message: string, code: string, additionalInfo: Record<string, any> = {}) {
+  constructor(
+    message: string,
+    code: string,
+    additionalInfo: Record<string, any> = {}
+  ) {
     super(message);
     this.code = code;
     this.additionalInfo = additionalInfo;
@@ -15,8 +19,8 @@ export class BaseError extends Error {
       message: this.message,
       extensions: {
         code: this.code,
-        ...this.additionalInfo
-      }
+        ...this.additionalInfo,
+      },
     };
   }
 }
@@ -34,7 +38,10 @@ export class AuthorizationError extends BaseError {
 }
 
 export class ValidationError extends BaseError {
-  constructor(message: string = ERROR_MESSAGES.BAD_USER_INPUT, fields: Record<string, string>) {
+  constructor(
+    message: string = ERROR_MESSAGES.BAD_USER_INPUT,
+    fields: Record<string, string>
+  ) {
     super(message, 'BAD_USER_INPUT', { fields });
   }
 }

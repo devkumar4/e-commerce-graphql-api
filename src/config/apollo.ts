@@ -26,7 +26,7 @@ export const apolloOptions: ApolloServerOptions<BaseContext> = {
     ) {
       return {
         message: 'An internal error occurred',
-        extensions: { code: 'INTERNAL_SERVER_ERROR' }
+        extensions: { code: 'INTERNAL_SERVER_ERROR' },
       };
     }
 
@@ -42,7 +42,7 @@ export const apolloLoggingPlugin = {
     return {
       async serverWillStop() {
         console.log('Apollo Server shutting down...');
-      }
+      },
     };
   },
 
@@ -62,7 +62,7 @@ export const apolloLoggingPlugin = {
             }
           }
         }
-      }
+      },
     };
-  }
+  },
 };

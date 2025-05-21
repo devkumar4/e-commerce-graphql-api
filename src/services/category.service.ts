@@ -16,5 +16,8 @@ export async function getCategories() {
 }
 
 export async function getCategoryById(id: string) {
-  return prisma.category.findUnique({ where: { id }, include: { products: true } });
+  return prisma.category.findUnique({
+    where: { id },
+    include: { products: true },
+  });
 }

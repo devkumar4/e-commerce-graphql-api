@@ -3,7 +3,13 @@ import { ProductInput } from '../types/product.types';
 import { NotFoundError, ValidationError } from '../utils/error.utils';
 
 export async function getProducts(
-  filters: { categoryId?: string; minPrice?: number; maxPrice?: number; offset?: number; limit?: number },
+  filters: {
+    categoryId?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    offset?: number;
+    limit?: number;
+  },
   prisma: PrismaClient
 ) {
   const where: any = {};
@@ -18,14 +24,14 @@ export async function getProducts(
     where,
     skip: filters.offset || 0,
     take: filters.limit || 10,
-    include: { category: true }
+    include: { category: true },
   });
 }
 
 export async function getProductById(id: string, prisma: PrismaClient) {
   const product = await prisma.product.findUnique({
     where: { id },
-    include: { category: true }
+    include: { category: true },
   });
   if (!product) throw new NotFoundError('Product', id);
   return product;
@@ -37,13 +43,17 @@ export async function createProduct(input: ProductInput, prisma: PrismaClient) {
   return prisma.product.create({
     data: {
       ...input,
-      price: parseFloat(input.price.toString())
+      price: parseFloat(input.price.toString()),
     },
-    include: { category: true }
+    include: { category: true },
   });
 }
 
-export async function updateProduct(id: string, input: ProductInput, prisma: PrismaClient) {
+export async function updateProduct(
+  id: string,
+  input: ProductInput,
+  prisma: PrismaClient
+) {
   validateProductInput(input);
 
   const product = await prisma.product.findUnique({ where: { id } });
@@ -53,9 +63,9 @@ export async function updateProduct(id: string, input: ProductInput, prisma: Pri
     where: { id },
     data: {
       ...input,
-      price: parseFloat(input.price.toString())
+      price: parseFloat(input.price.toString()),
     },
-    include: { category: true }
+    include: { category: true },
   });
 }
 
@@ -74,15 +84,27 @@ export function validateProductInput(input: {
   inventory: number;
   categoryId: string;
 }) {
-  if (!input.name || !input.description || input.price == null || input.inventory == null || !input.categoryId) {
+  if (
+    !input.name ||
+    !input.description ||
+    input.price == null ||
+    input.inventory == null ||
+    !input.categoryId
+  ) {
     throw new ValidationError('All product fields are required', {
       name: !input.name ? 'Name is required' : '',
       description: !input.description ? 'Description is required' : '',
       price: input.price == null ? 'Price is required' : '',
       inventory: input.inventory == null ? 'Inventory is required' : '',
-      categoryId: !input.categoryId ? 'CategoryId is required' : ''
+      categoryId: !input.categoryId ? 'CategoryId is required' : '',
     });
   }
-  if (input.price < 0) throw new ValidationError('Price must be positive', { price: 'Price must be positive' });
-  if (input.inventory < 0) throw new ValidationError('Inventory must be positive', { inventory: 'Inventory must be positive' });
+  if (input.price < 0)
+    throw new ValidationError('Price must be positive', {
+      price: 'Price must be positive',
+    });
+  if (input.inventory < 0)
+    throw new ValidationError('Inventory must be positive', {
+      inventory: 'Inventory must be positive',
+    });
 }

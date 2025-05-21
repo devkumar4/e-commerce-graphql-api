@@ -23,14 +23,14 @@ const dateTimeScalar = new GraphQLScalarType({
   parseLiteral(ast) {
     if (ast.kind === Kind.STRING) return new Date(ast.value);
     return null;
-  }
+  },
 });
 
 // Base resolvers with scalars and placeholder Query/Mutation
 const baseResolvers = {
   DateTime: dateTimeScalar,
   Query: { _empty: () => '' },
-  Mutation: { _empty: () => '' }
+  Mutation: { _empty: () => '' },
 };
 
 // Merge all module-specific resolvers
@@ -39,5 +39,5 @@ export const resolvers = [
   userResolvers,
   productResolvers,
   categoryResolvers,
-  orderResolvers
+  orderResolvers,
 ];

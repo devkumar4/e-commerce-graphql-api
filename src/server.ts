@@ -41,7 +41,7 @@ async function startServer() {
     schema,
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),
-      apolloLoggingPlugin
+      apolloLoggingPlugin,
     ],
   });
 
@@ -55,7 +55,7 @@ async function startServer() {
     cors<cors.CorsRequest>(corsOptions),
     json(),
     expressMiddleware(server, {
-      context: createContext
+      context: createContext,
     })
   );
 
@@ -68,8 +68,10 @@ async function startServer() {
   await new Promise<void>((resolve) => {
     httpServer.listen({ port: serverConfig.port }, resolve);
   });
-  
-  console.log(`🚀 Server ready at http://localhost:${serverConfig.port}/graphql`);
+
+  console.log(
+    `🚀 Server ready at http://localhost:${serverConfig.port}/graphql`
+  );
   console.log(`Environment: ${serverConfig.environment}`);
 
   // Handle shutdown gracefully

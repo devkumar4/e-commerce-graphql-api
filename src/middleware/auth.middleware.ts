@@ -8,7 +8,10 @@ interface ContextParams {
   prisma: PrismaClient;
 }
 
-export const authMiddleware = async ({ req, prisma }: ContextParams): Promise<GraphQLContext> => {
+export const authMiddleware = async ({
+  req,
+  prisma,
+}: ContextParams): Promise<GraphQLContext> => {
   const context: GraphQLContext = { prisma };
 
   const authHeader = req.headers.authorization;

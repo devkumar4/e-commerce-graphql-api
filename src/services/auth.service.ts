@@ -10,8 +10,8 @@ export async function registerUser(input: RegisterInput) {
     data: {
       ...input,
       password: hashedPassword,
-      role: 'CUSTOMER'
-    }
+      role: 'CUSTOMER',
+    },
   });
 }
 

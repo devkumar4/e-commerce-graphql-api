@@ -12,16 +12,20 @@ interface JwtPayload {
  * @param user - Contains user ID, email, and role
  * @returns Signed JWT token
  */
-export const generateToken = (user: { id: string; email: string; role: string }): string => {
+export const generateToken = (user: {
+  id: string;
+  email: string;
+  role: string;
+}): string => {
   return jwt.sign(
     {
       userId: user.id,
       email: user.email,
-      role: user.role
+      role: user.role,
     },
     process.env.JWT_SECRET as string,
     {
-      expiresIn: '24h'
+      expiresIn: '24h',
     }
   );
 };
@@ -41,7 +45,7 @@ export const verifyToken = (token: string): AuthUser | null => {
     return {
       userId: decoded.userId,
       email: decoded.email,
-      role: decoded.role as 'ADMIN' | 'CUSTOMER'
+      role: decoded.role as 'ADMIN' | 'CUSTOMER',
     };
   } catch {
     return null; // Invalid token

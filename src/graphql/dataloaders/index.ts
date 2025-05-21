@@ -5,6 +5,6 @@ import { PrismaClient } from '@prisma/client';
 export function createLoaders(prisma: PrismaClient) {
   return {
     productLoader: createProductLoader(prisma),
-    categoryLoader: createCategoryLoader(prisma)
+    categoryLoader: createCategoryLoader(prisma),
   };
 }

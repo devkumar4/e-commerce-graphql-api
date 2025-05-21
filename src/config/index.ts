@@ -3,7 +3,7 @@ export * from './database';
 export * from './apollo';
 export * from './auth';
 
-// Server configuration 
+// Server configuration
 export const serverConfig = {
   port: process.env.PORT || 4000,
   environment: process.env.NODE_ENV || 'development',
@@ -13,9 +13,10 @@ export const serverConfig = {
 // CORS configuration
 export const corsOptions = {
   // In development, allow all origins for testing
-  origin: process.env.NODE_ENV === 'development'
-    ? '*'
-    : process.env.ALLOWED_ORIGINS?.split(',') || [],
+  origin:
+    process.env.NODE_ENV === 'development'
+      ? '*'
+      : process.env.ALLOWED_ORIGINS?.split(',') || [],
   credentials: true,
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],

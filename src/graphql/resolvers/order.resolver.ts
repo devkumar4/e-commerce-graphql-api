@@ -2,7 +2,7 @@ import { OrderInput } from '../../types/order.types';
 import {
   AuthenticationError,
   AuthorizationError,
-  NotFoundError
+  NotFoundError,
 } from '../../utils/error.utils';
 import { GraphQLContext } from '../../types/context.types';
 import { validateOrderInput } from '../../utils/validation.utils';
@@ -12,7 +12,7 @@ import {
   getOrders,
   getOrderById,
   createOrder,
-  updateOrderStatus
+  updateOrderStatus,
 } from '../../services/order.service';
 
 export const orderResolvers = {
@@ -33,20 +33,29 @@ export const orderResolvers = {
       }
 
       return order;
-    }
+    },
   },
 
   Mutation: {
-    createOrder: async (_: any, { input }: { input: OrderInput }, { user }: GraphQLContext) => {
+    createOrder: async (
+      _: any,
+      { input }: { input: OrderInput },
+      { user }: GraphQLContext
+    ) => {
       validateOrderInput(input);
       if (!user) throw new AuthenticationError();
       return createOrder(user.userId, input);
     },
 
-    updateOrderStatus: async (_: any, { id, status }: { id: string; status: OrderStatusType }, { user }: GraphQLContext) => {
+    updateOrderStatus: async (
+      _: any,
+      { id, status }: { id: string; status: OrderStatusType },
+      { user }: GraphQLContext
+    ) => {
       if (!user) throw new AuthenticationError();
-      if (user.role !== 'ADMIN') throw new AuthorizationError('Only admins can update order status');
+      if (user.role !== 'ADMIN')
+        throw new AuthorizationError('Only admins can update order status');
       return updateOrderStatus(id, status);
-    }
-  }
+    },
+  },
 };
