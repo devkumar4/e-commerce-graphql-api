@@ -4,11 +4,12 @@ import { createTestServer } from '../utils/setup';
 describe('Category Integration', () => {
   let server: any;
   let adminToken: string;
-  let categoryId: string;
 
   beforeAll(async () => {
     server = await createTestServer();
-    await request(server.httpServer).post('/graphql').send({
+
+    // Register admin user
+    const registerRes = await request(server.httpServer).post('/graphql').send({
       query: `
         mutation {
           register(input: {
@@ -16,12 +17,22 @@ describe('Category Integration', () => {
             password: "Admin123!"
             firstName: "Admin"
             lastName: "Cat"
-          }) { token user { id } }
+          }) {
+            token
+            user { id }
+          }
         }
       `
     });
-    // Promote to ADMIN in DB as needed
-    const res = await request(server.httpServer).post('/graphql').send({
+
+    if (registerRes.body.errors) {
+      console.error('Register errors:', registerRes.body.errors);
+    }
+
+    // NOTE: If you need to promote to admin in DB manually here, do it.
+
+    // Login admin user
+    const loginRes = await request(server.httpServer).post('/graphql').send({
       query: `
         mutation {
           login(email: "admin@cat.com", password: "Admin123!") {
@@ -30,7 +41,15 @@ describe('Category Integration', () => {
         }
       `
     });
-    adminToken = res.body.data.login.token;
+
+    if (loginRes.body.errors) {
+      console.error('Login errors:', loginRes.body.errors);
+    }
+
+    adminToken = loginRes.body.data?.login?.token;
+    if (!adminToken) {
+      throw new Error('Admin login failed, token not received');
+    }
   });
 
   afterAll(async () => {
@@ -51,8 +70,12 @@ describe('Category Integration', () => {
           }
         `
       });
-    expect(res.body.data.createCategory.name).toBe('Cat1');
-    categoryId = res.body.data.createCategory.id;
+
+    if (res.body.errors) {
+      console.error('Create category errors:', res.body.errors);
+    }
+
+    expect(res.body.data?.createCategory?.name).toBe('Cat1');
   });
 
   it('queries categories', async () => {
@@ -68,6 +91,11 @@ describe('Category Integration', () => {
           }
         `
       });
-    expect(res.body.data.categories.length).toBeGreaterThan(0);
+
+    if (res.body.errors) {
+      console.error('Query categories errors:', res.body.errors);
+    }
+
+    expect(res.body.data?.categories.length).toBeGreaterThan(0);
   });
 });

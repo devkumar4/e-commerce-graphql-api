@@ -1,3 +1,5 @@
+import { ERROR_MESSAGES } from "../constants/error.constants"
+
 export class BaseError extends Error {
   code: string;
   additionalInfo: Record<string, any>;
@@ -20,19 +22,19 @@ export class BaseError extends Error {
 }
 
 export class AuthenticationError extends BaseError {
-  constructor(message: string = 'Not authenticated') {
+  constructor(message: string = ERROR_MESSAGES.UNAUTHENTICATED) {
     super(message, 'UNAUTHENTICATED');
   }
 }
 
 export class AuthorizationError extends BaseError {
-  constructor(message: string = 'Not authorized') {
+  constructor(message: string = ERROR_MESSAGES.FORBIDDEN) {
     super(message, 'FORBIDDEN');
   }
 }
 
 export class ValidationError extends BaseError {
-  constructor(message: string, fields: Record<string, string>) {
+  constructor(message: string = ERROR_MESSAGES.BAD_USER_INPUT, fields: Record<string, string>) {
     super(message, 'BAD_USER_INPUT', { fields });
   }
 }

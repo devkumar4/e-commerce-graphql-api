@@ -1,7 +1,7 @@
-// Ensure this file exports a function for test server setup
-
 import { ApolloServer } from '@apollo/server';
-import { typeDefs } from '../../src/graphql/schema';
+import { makeExecutableSchema } from '@graphql-tools/schema';
+import { mergeTypeDefs } from '@graphql-tools/merge';
+import { typeDefs as baseTypeDefs } from '../../src/graphql/schema';  // adjust import
 import { resolvers } from '../../src/graphql/resolvers';
 import { PrismaClient } from '@prisma/client';
 import { authMiddleware } from '../../src/middleware/auth.middleware';
@@ -12,10 +12,14 @@ import { json } from 'body-parser';
 import { expressMiddleware } from '@apollo/server/express4';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
 
-// Define the context type
+// Compose directive SDL separately
+const authDirectiveSDL = `
+  directive @auth on FIELD_DEFINITION | OBJECT
+`;
+
 export type GraphQLContext = {
   prisma: PrismaClient;
-  user?: any; // Adjust 'any' to your actual user type if available
+  user?: any; // Adjust user type as needed
 };
 
 export async function createTestServer() {
@@ -23,9 +27,20 @@ export async function createTestServer() {
   const httpServer = http.createServer(app);
   const prisma = new PrismaClient();
 
-  const server = new ApolloServer<GraphQLContext>({
-    typeDefs,
+  // Merge typeDefs properly as array of SDLs or DocumentNodes
+  const mergedTypeDefs = mergeTypeDefs([authDirectiveSDL, baseTypeDefs]);
+
+  // Build executable schema
+  let schema = makeExecutableSchema({
+    typeDefs: mergedTypeDefs,
     resolvers,
+  });
+
+  // If you have a schema transformer for auth directive, apply it here
+  // schema = authDirectiveTransformer(schema);
+
+  const server = new ApolloServer<GraphQLContext>({
+    schema,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
   });
 
@@ -36,7 +51,7 @@ export async function createTestServer() {
     cors(),
     json(),
     expressMiddleware(server, {
-      context: async ({ req }) => authMiddleware({ req, prisma })
+      context: async ({ req }) => authMiddleware({ req, prisma }),
     })
   );
 
@@ -46,6 +61,6 @@ export async function createTestServer() {
       await server.stop();
       await prisma.$disconnect();
       httpServer.close();
-    }
+    },
   };
 }

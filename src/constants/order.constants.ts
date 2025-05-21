@@ -5,3 +5,5 @@ export const ORDER_STATUS = {
   DELIVERED: 'DELIVERED',
   CANCELLED: 'CANCELLED'
 } as const;
+
+export type OrderStatusType = typeof ORDER_STATUS[keyof typeof ORDER_STATUS];

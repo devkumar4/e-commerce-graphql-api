@@ -40,7 +40,8 @@
     "graphql-scalars": "^1.22.4",
     "graphql-tag": "^2.12.6",
     "graphql-tools": "^9.0.18",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "zod": "^3.25.16"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

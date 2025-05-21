@@ -36,8 +36,13 @@ describe('Auth Integration', () => {
           }
         `
       });
-    expect(res.body.data.register.user.email).toBe('testuser@example.com');
-    expect(res.body.data.register.token).toBeDefined();
+
+    if (res.body.errors) {
+      console.error('GraphQL Errors (register):', res.body.errors);
+    }
+
+    expect(res.body.data?.register?.user?.email).toBe('testuser@example.com');
+    expect(res.body.data?.register?.token).toBeDefined();
   });
 
   it('logs in an existing user', async () => {
@@ -57,7 +62,12 @@ describe('Auth Integration', () => {
           }
         `
       });
-    expect(res.body.data.login.user.email).toBe('testuser@example.com');
-    expect(res.body.data.login.token).toBeDefined();
+
+    if (res.body.errors) {
+      console.error('GraphQL Errors (login):', res.body.errors);
+    }
+
+    expect(res.body.data?.login?.user?.email).toBe('testuser@example.com');
+    expect(res.body.data?.login?.token).toBeDefined();
   });
 });

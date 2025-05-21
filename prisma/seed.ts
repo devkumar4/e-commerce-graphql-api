@@ -61,7 +61,7 @@ async function seed() {
 
     console.log('Created categories');
 
-    // Create products
+
     const phone = await prisma.product.create({
       data: {
         name: 'Smartphone',
@@ -84,7 +84,7 @@ async function seed() {
 
     console.log('Created products');
 
-    // Create order for customer
+
     const order = await prisma.order.create({
       data: {
         userId: customer.id,
