@@ -9,6 +9,7 @@ import express from 'express';
 import http from 'http';
 import cors from 'cors';
 import { json } from 'body-parser';
+import { makeExecutableSchema } from '@graphql-tools/schema';
 
 // Import configuration
 import { apolloLoggingPlugin, corsOptions, serverConfig } from './config';
@@ -17,7 +18,8 @@ import { testConnection, disconnect } from './config/database';
 // Import GraphQL schema and resolvers (will be populated in next features)
 import { typeDefs } from './graphql/schema';
 import { resolvers } from './graphql/resolvers';
-import { createContext } from './graphql/context';
+import { createContext, GraphQLContext } from './graphql/context';
+import { authDirectiveTransformer } from './graphql/directives/auth.directive';
 
 async function startServer() {
   // Create Express app and HTTP server
@@ -32,9 +34,11 @@ async function startServer() {
   }
 
   // Create Apollo Server instance
-  const server = new ApolloServer({
-    typeDefs,
-    resolvers,
+  const rawSchema = makeExecutableSchema({ typeDefs, resolvers });
+  const schema = authDirectiveTransformer(rawSchema);
+
+  const server = new ApolloServer<GraphQLContext>({
+    schema,
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),
       apolloLoggingPlugin

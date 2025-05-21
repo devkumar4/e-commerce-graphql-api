@@ -39,6 +39,7 @@
     "graphql": "^16.8.1",
     "graphql-scalars": "^1.22.4",
     "graphql-tag": "^2.12.6",
+    "graphql-tools": "^9.0.18",
     "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {

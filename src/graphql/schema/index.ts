@@ -5,6 +5,7 @@ import { userTypeDefs } from './user.schema';
 import { categoryTypeDefs } from './category.schema';
 import { productTypeDefs } from './product.schema';
 import { orderTypeDefs } from './order.schema';
+import { commonTypeDefs } from './common.schema';
 
 // Base schema with common types and scalar definitions
 const baseSchema = `#graphql
@@ -25,6 +26,7 @@ const baseSchema = `#graphql
 // Export combined schema
 // For now, we only have the base schema
 export const typeDefs = [
+  commonTypeDefs,
   baseSchema,
   userTypeDefs,
   productTypeDefs,

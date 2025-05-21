@@ -21,7 +21,7 @@ export const categoryTypeDefs = gql`
   }
 
   extend type Mutation {
-    createCategory(input: CategoryInput!): Category!
-    updateCategory(id: ID!, input: CategoryInput!): Category!
+    createCategory(input: CategoryInput!): Category! @auth
+    updateCategory(id: ID!, input: CategoryInput!): Category! @auth
   }
 `;

@@ -36,12 +36,12 @@ export const orderTypeDefs = gql`
   }
 
   extend type Query {
-    orders: [Order!]!
-    order(id: ID!): Order
+    orders: [Order!]! @auth
+    order(id: ID!): Order @auth
   }
 
   extend type Mutation {
-    createOrder(input: OrderInput!): Order!
-    updateOrderStatus(id: ID!, status: OrderStatus!): Order!
+    createOrder(input: OrderInput!): Order! @auth
+    updateOrderStatus(id: ID!, status: OrderStatus!): Order! @auth
   }
 `;

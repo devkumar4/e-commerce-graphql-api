@@ -12,12 +12,18 @@ import { json } from 'body-parser';
 import { expressMiddleware } from '@apollo/server/express4';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
 
+// Define the context type
+export type GraphQLContext = {
+  prisma: PrismaClient;
+  user?: any; // Adjust 'any' to your actual user type if available
+};
+
 export async function createTestServer() {
   const app = express();
   const httpServer = http.createServer(app);
   const prisma = new PrismaClient();
 
-  const server = new ApolloServer({
+  const server = new ApolloServer<GraphQLContext>({
     typeDefs,
     resolvers,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],

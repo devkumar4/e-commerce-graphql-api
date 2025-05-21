@@ -12,7 +12,7 @@ export const userResolvers = {
     /**
      * Register a new user
      */
-    register: async (_: any, { input }: { input: RegisterInput }) => {
+    register: async (_: any, { input }: { input: RegisterInput; }, p0: { prisma: { user: { findUnique: jest.Mock<any, any, any>; }; }; }) => {
       try {
         validateRegisterInput(input);
         console.log('[register] Input:', input);
@@ -71,7 +71,7 @@ export const userResolvers = {
     /**
      * Login an existing user
      */
-    login: async (_: any, { email, password }: { email: string; password: string }) => {
+    login: async (_: any, { email, password }: { email: string; password: string; }, p0: { prisma: { user: { findUnique: jest.Mock<any, any, any>; }; }; }) => {
       try {
         console.log('[login] email:', email);
 

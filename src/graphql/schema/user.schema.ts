@@ -32,4 +32,9 @@ export const userTypeDefs = gql`
     register(input: RegisterInput!): AuthPayload!
     login(email: String!, password: String!): AuthPayload!
   }
+
+  extend type Query {
+    me: User @auth
+    users: [User!]! @auth
+  }
 `;

@@ -33,8 +33,8 @@ export const productTypeDefs = gql`
   }
 
   extend type Mutation {
-    createProduct(input: ProductInput!): Product!
-    updateProduct(id: ID!, input: ProductInput!): Product!
-    deleteProduct(id: ID!): Boolean!
+    createProduct(input: ProductInput!): Product! @auth
+    updateProduct(id: ID!, input: ProductInput!): Product! @auth
+    deleteProduct(id: ID!): Boolean! @auth
   }
 `;

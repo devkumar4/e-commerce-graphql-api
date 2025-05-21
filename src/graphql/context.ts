@@ -45,3 +45,10 @@ export const createContext = async ({ req }: { req: Request }): Promise<GraphQLC
   
   return context;
 };
+
+import { authMiddleware } from '../middleware/auth.middleware';
+
+export async function createContext({ req }: { req: any }) {
+  const prisma = new PrismaClient();
+  return authMiddleware({ req, prisma });
+}

@@ -56,7 +56,7 @@ describe('Product Integration', () => {
     await server.stop();
   });
 
-  it('creates a product', async () => {
+  it('creates a product as admin', async () => {
     const res = await request(server.httpServer)
       .post('/graphql')
       .set('Authorization', `Bearer ${adminToken}`)
@@ -72,12 +72,67 @@ describe('Product Integration', () => {
             }) {
               id
               name
+              price
+              inventory
+              category { id }
             }
           }
         `
       });
     expect(res.body.data.createProduct.name).toBe('TestProduct');
+    expect(res.body.data.createProduct.price).toBe(10);
+    expect(res.body.data.createProduct.inventory).toBe(5);
+    expect(res.body.data.createProduct.category.id).toBe(categoryId);
     productId = res.body.data.createProduct.id;
+  });
+
+  it('fails to create a product as customer', async () => {
+    // Register and login as customer
+    await request(server.httpServer).post('/graphql').send({
+      query: `
+        mutation {
+          register(input: {
+            email: "customer@e2e.com"
+            password: "Customer123!"
+            firstName: "Customer"
+            lastName: "User"
+          }) { token user { id } }
+        }
+      `
+    });
+    const resLogin = await request(server.httpServer).post('/graphql').send({
+      query: `
+        mutation {
+          login(email: "customer@e2e.com", password: "Customer123!") {
+            token
+          }
+        }
+      `
+    });
+    const customerToken = resLogin.body.data.login.token;
+
+    // Try to create product as customer
+    const res = await request(server.httpServer)
+      .post('/graphql')
+      .set('Authorization', `Bearer ${customerToken}`)
+      .send({
+        query: `
+          mutation {
+            createProduct(input: {
+              name: "ShouldFail"
+              description: "desc"
+              price: 10
+              inventory: 5
+              categoryId: "${categoryId}"
+            }) {
+              id
+              name
+            }
+          }
+        `
+      });
+    expect(res.body.errors).toBeDefined();
+    expect(res.body.errors[0].message).toMatch(/Only admins can create products/);
   });
 
   it('queries products', async () => {
@@ -89,10 +144,55 @@ describe('Product Integration', () => {
             products {
               id
               name
+              price
+              inventory
+              category { id }
             }
           }
         `
       });
     expect(res.body.data.products.length).toBeGreaterThan(0);
+    expect(res.body.data.products.some((p: any) => p.id === productId)).toBe(true);
+  });
+
+  it('updates a product as admin', async () => {
+    const res = await request(server.httpServer)
+      .post('/graphql')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        query: `
+          mutation {
+            updateProduct(id: "${productId}", input: {
+              name: "UpdatedProduct"
+              description: "updated desc"
+              price: 20
+              inventory: 10
+              categoryId: "${categoryId}"
+            }) {
+              id
+              name
+              price
+              inventory
+            }
+          }
+        `
+      });
+    expect(res.body.data.updateProduct.name).toBe('UpdatedProduct');
+    expect(res.body.data.updateProduct.price).toBe(20);
+    expect(res.body.data.updateProduct.inventory).toBe(10);
+  });
+
+  it('deletes a product as admin', async () => {
+    const res = await request(server.httpServer)
+      .post('/graphql')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        query: `
+          mutation {
+            deleteProduct(id: "${productId}")
+          }
+        `
+      });
+    expect(res.body.data.deleteProduct).toBe(true);
   });
 });
