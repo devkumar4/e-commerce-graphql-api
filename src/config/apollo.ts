@@ -1,28 +1,25 @@
 import { ApolloServerOptions } from '@apollo/server';
 import { BaseContext } from '@apollo/server/dist/esm/externalTypes/context';
 
-// Import GraphQL schema here (will be implemented later)
-// import { typeDefs } from '../graphql/schema';
-// import { resolvers } from '../graphql/resolvers';
+import { typeDefs } from '../graphql/schema';
+import { resolvers } from '../graphql/resolvers';
 
-// Custom Apollo Server options
+// Apollo Server configuration
 export const apolloOptions: ApolloServerOptions<BaseContext> = {
-  // typeDefs and resolvers will be imported when created
-  // typeDefs,
-  // resolvers,
-  
-  // Enable introspection in all environments for development
-  // In production, it should be disabled for security
+  typeDefs,
+  resolvers,
+
+  // Enable introspection always for local/dev debugging
   introspection: true,
-  
-  // Custom formatError function to standardize error responses
+
+  // Unified error formatting
   formatError: (formattedError, error) => {
-    // Log server errors but not client errors
+    // Log internal server errors
     if (formattedError.extensions?.code === 'INTERNAL_SERVER_ERROR') {
       console.error('GraphQL ERROR:', error);
     }
 
-    // Don't expose internal server errors to clients in production
+    // Mask internal errors in production
     if (
       process.env.NODE_ENV === 'production' &&
       formattedError.extensions?.code === 'INTERNAL_SERVER_ERROR'
@@ -33,14 +30,13 @@ export const apolloOptions: ApolloServerOptions<BaseContext> = {
       };
     }
 
-    // Return the formatted error
     return formattedError;
   },
 };
 
-// Apollo custom plugin for logging
+// Apollo plugin for lifecycle logging
 export const apolloLoggingPlugin = {
-  // Server startup
+  // Server startup/shutdown logs
   serverWillStart: async () => {
     console.log('Apollo Server starting up...');
     return {
@@ -49,20 +45,19 @@ export const apolloLoggingPlugin = {
       }
     };
   },
-  
-  // Request lifecycle
+
+  // Log request duration and GraphQL errors in dev
   async requestDidStart() {
     const start = Date.now();
     return {
-      async willSendResponse({ response }) {
+      async willSendResponse({ response }: { response: any }) {
         const duration = Date.now() - start;
         console.log(`Request completed in ${duration}ms`);
-        
-        // Log detailed info in development
+
         if (process.env.NODE_ENV === 'development') {
           if (response.body.kind === 'single') {
             const { errors } = response.body.singleResult;
-            if (errors && errors.length > 0) {
+            if (errors?.length) {
               console.log('GraphQL response errors:', errors);
             }
           }

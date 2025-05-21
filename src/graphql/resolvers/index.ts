@@ -1,60 +1,43 @@
-// This file will combine all GraphQL resolvers
-
-// Import GraphQL scalars
+// Combine all GraphQL resolvers
 import { GraphQLScalarType, Kind } from 'graphql';
 
-// We'll import our resolver modules here when they're created
-import {userResolvers} from './user.resolver';
+import { userResolvers } from './user.resolver';
 import { categoryResolvers } from './category.resolver';
 import { productResolvers } from './product.resolver';
 import { orderResolvers } from './order.resolver';
 
-// Define scalar resolvers
+// Custom scalar for ISO DateTime
 const dateTimeScalar = new GraphQLScalarType({
   name: 'DateTime',
   description: 'DateTime scalar type',
-  
-  // Convert output Date to ISO string
+
   serialize(value: unknown) {
     return value instanceof Date ? value.toISOString() : null;
   },
-  
-  // Parse ISO string to Date for variables
+
   parseValue(value: unknown) {
-    if (typeof value === 'string') {
-      return new Date(value);
-    }
+    if (typeof value === 'string') return new Date(value);
     return null;
   },
-  
-  // Parse literal ISO string (in query) to Date
+
   parseLiteral(ast) {
-    if (ast.kind === Kind.STRING) {
-      return new Date(ast.value);
-    }
+    if (ast.kind === Kind.STRING) return new Date(ast.value);
     return null;
-  },
+  }
 });
 
-// Define base resolvers with scalars
+// Base resolvers with scalars and placeholder Query/Mutation
 const baseResolvers = {
   DateTime: dateTimeScalar,
-  
-  // Empty resolvers to satisfy the base schema
-  Query: {
-    _empty: () => ''
-  },
-  
-  Mutation: {
-    _empty: () => ''
-  }
+  Query: { _empty: () => '' },
+  Mutation: { _empty: () => '' }
 };
 
-// Combine all resolvers
+// Merge all module-specific resolvers
 export const resolvers = [
   baseResolvers,
   userResolvers,
   productResolvers,
   categoryResolvers,
-  orderResolvers,
+  orderResolvers
 ];

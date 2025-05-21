@@ -86,34 +86,4 @@ e-commerce-graphql-api/
 
 ## API Documentation
 
-The GraphQL API documentation can be accessed through the Apollo Studio Explorer at `http://localhost:4000/graphql` when the server is running.
-
-## Setup
-
-1. Install dependencies:
-   ```
-   npm install
-   ```
-
-2. Copy `.env.example` to `.env` and set your environment variables.
-
-3. Run database migrations:
-   ```
-   npx prisma migrate dev
-   ```
-
-4. Start the server:
-   ```
-   npm run dev
-   ```
-
-## Testing
-
-Run all tests:
-```
-npm test
-```
-
-## Example Queries
-
-See `docs/queries/` for example GraphQL queries and mutations.
+The GraphQL API documentation can be accessed through the Apollo Studio Explorer at `http://localhost:4000/graphql` when the server is running.W

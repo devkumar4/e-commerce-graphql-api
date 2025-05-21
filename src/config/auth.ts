@@ -1,36 +1,25 @@
-// Authentication configuration
+// Authentication-related configuration and role-based access control
 
-// JWT configuration options
+// JWT options — secret from env, expiry, algorithm, and issuer
 export const jwtConfig = {
-  // Secret key from environment variables
-  secret: process.env.JWT_SECRET || 'default-development-only-secret',
-  
-  // Token expiration settings
+  secret: process.env.JWT_SECRET || 'default-development-only-secret', // fallback for dev only
   expiresIn: process.env.JWT_EXPIRES_IN || '24h',
-  
-  // Algorithm used for signing
   algorithm: 'HS256' as const,
-  
-  // Token issuer
   issuer: 'e-commerce-api',
 };
 
-// Password hashing configuration
+// Password hashing using bcrypt salt rounds
 export const passwordHashConfig = {
-  // Number of salt rounds for bcrypt
   saltRounds: 10,
 };
 
-// Role-based access control
+// Defined user roles with escalating privileges
 export const roles = {
-  // Admin role can perform all operations
-  ADMIN: 'ADMIN',
-  
-  // Customer role has limited permissions
-  CUSTOMER: 'CUSTOMER',
+  ADMIN: 'ADMIN',     // Full control
+  CUSTOMER: 'CUSTOMER', // Restricted permissions
 };
 
-// Permission checks for operations
+// Operation-level permissions mapped to roles
 export const permissions = {
   products: {
     create: [roles.ADMIN],
@@ -60,7 +49,7 @@ export const permissions = {
   },
 };
 
-// Check if user has required permission
+// Utility to check if a user's role grants the required permission
 export const hasPermission = (
   userRole: string | undefined,
   requiredRoles: string[]
