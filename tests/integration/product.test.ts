@@ -215,4 +215,79 @@ describe('Product Integration', () => {
 
     expect(res.body.data.deleteProduct).toBe(true);
   });
+
+  it('queries products filtered by categoryId', async () => {
+    const res = await request(server.httpServer)
+      .post('/graphql')
+      .send({
+        query: `
+          query {
+            products(categoryId: "${categoryId}") {
+              id
+              name
+              category { id }
+            }
+          }
+        `,
+      });
+
+    expect(res.body.data.products.length).toBeGreaterThan(0);
+    expect(res.body.data.products.every((p: { category: { id: string } }) => p.category.id === categoryId)).toBe(true);
+  });
+
+  it('queries products filtered by minPrice and maxPrice', async () => {
+    // Create another product with a different price
+    await request(server.httpServer)
+      .post('/graphql')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        query: `
+          mutation {
+            createProduct(input: {
+              name: "ExpensiveProduct"
+              description: "desc"
+              price: 1000
+              inventory: 2
+              categoryId: "${categoryId}"
+            }) {
+              id
+              name
+              price
+            }
+          }
+        `,
+      });
+
+    // Query products with price >= 500
+    const resMin = await request(server.httpServer)
+      .post('/graphql')
+      .send({
+        query: `
+          query {
+            products(minPrice: 500) {
+              id
+              name
+              price
+            }
+          }
+        `,
+      });
+    expect(resMin.body.data.products.some((p: { price: number }) => p.price >= 500)).toBe(true);
+
+    // Query products with price <= 20
+    const resMax = await request(server.httpServer)
+      .post('/graphql')
+      .send({
+        query: `
+          query {
+            products(maxPrice: 20) {
+              id
+              name
+              price
+            }
+          }
+        `,
+      });
+    expect(resMax.body.data.products.every((p: { price: number }) => p.price <= 20)).toBe(true);
+  });
 });

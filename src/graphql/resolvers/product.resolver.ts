@@ -14,10 +14,28 @@ import {
 
 export const productResolvers = {
   Query: {
-    products: async (_: any, args: { skip?: number; take?: number }, context: GraphQLContext) => {
-      const { skip, take, ...rest } = args;
+    products: async (
+      _: any,
+      args: { 
+        skip?: number; 
+        take?: number; 
+        categoryId?: string; 
+        minPrice?: number; 
+        maxPrice?: number;
+      }, 
+      context: GraphQLContext
+    ) => {
+      const { skip, take, categoryId, minPrice, maxPrice, ...rest } = args;
+      // Pass filtering options to getProducts
       return getProducts(
-        { ...rest, offset: skip, limit: take },
+        { 
+          ...rest, 
+          offset: skip, 
+          limit: take, 
+          categoryId, 
+          minPrice, 
+          maxPrice 
+        },
         context.prisma
       );
     },
