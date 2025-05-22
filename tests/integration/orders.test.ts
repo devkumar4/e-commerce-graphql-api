@@ -2,7 +2,7 @@ import request from 'supertest';
 import { createTestServer } from '../utils/setup';
 
 describe('Order Integration', () => {
-  let server: Awaited<ReturnType<typeof createTestServer>>;
+  let server: any;
   let adminToken: string;
   let customerToken: string;
   let categoryId: string;

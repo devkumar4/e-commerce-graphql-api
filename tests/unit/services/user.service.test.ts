@@ -1,4 +1,3 @@
-
 import { comparePassword, hashPassword } from '../../../src/utils/password.utils';
 
 describe('userService', () => {

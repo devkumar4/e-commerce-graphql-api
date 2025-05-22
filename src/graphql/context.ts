@@ -1,11 +1,14 @@
 import { PrismaClient } from '@prisma/client';
 import { Request } from 'express';
 import { prisma } from '../config/database';
+import { createProductLoader } from './dataloaders/product.loader';
+import { createUserLoader } from './dataloaders/user.loader';
+import { createCategoryLoader } from './dataloaders/category.loader';
 
-// This will be implemented in auth middleware
+
 import { verifyToken } from '../utils/jwt.utils';
 
-// Define the shape of our authenticated user
+
 export interface AuthUser {
   userId: string;
   email: string;
@@ -17,6 +20,9 @@ export interface GraphQLContext {
   prisma: PrismaClient;
   user?: AuthUser;
   req: Request;
+  productLoader: ReturnType<typeof createProductLoader>;
+  userLoader: ReturnType<typeof createUserLoader>;
+  categoryLoader: ReturnType<typeof createCategoryLoader>;
 }
 
 // Create context for each request
@@ -29,6 +35,9 @@ export const createContext = async ({
   const context: GraphQLContext = {
     prisma,
     req,
+    productLoader: createProductLoader(prisma),
+    userLoader: createUserLoader(prisma),
+    categoryLoader: createCategoryLoader(prisma),
   };
 
   // Extract token from Authorization header
@@ -49,10 +58,3 @@ export const createContext = async ({
 
   return context;
 };
-
-// import { authMiddleware } from '../middleware/auth.middleware';
-
-// export async function createContext({ req }: { req: any }) {
-//   const prisma = new PrismaClient();
-//   return authMiddleware({ req, prisma });
-// }

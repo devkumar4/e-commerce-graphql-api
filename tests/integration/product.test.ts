@@ -2,8 +2,9 @@ import request from 'supertest';
 import { createTestServer } from '../utils/setup';
 
 describe('Product Integration', () => {
-  let server: Awaited<ReturnType<typeof createTestServer>>;
+  let server: any;
   let adminToken: string;
+  let customerToken: string;
   let categoryId: string;
   let productId: string;
 
@@ -42,6 +43,36 @@ describe('Product Integration', () => {
         `,
       });
     adminToken = loginRes.body.data.login.token;
+
+    // Register customer
+    await request(server.httpServer)
+      .post('/graphql')
+      .send({
+        query: `
+          mutation {
+            register(input: {
+              email: "customer@e2e.com"
+              password: "Customer123!"
+              firstName: "Customer"
+              lastName: "User"
+            }) { token user { id } }
+          }
+        `,
+      });
+
+    // Login as customer
+    const resLogin = await request(server.httpServer)
+      .post('/graphql')
+      .send({
+        query: `
+          mutation {
+            login(email: "customer@e2e.com", password: "Customer123!") {
+              token
+            }
+          }
+        `,
+      });
+    customerToken = resLogin.body.data.login.token;
 
     // Create category
     const catRes = await request(server.httpServer)
@@ -96,36 +127,6 @@ describe('Product Integration', () => {
   });
 
   it('fails to create a product as customer', async () => {
-    // Register customer
-    await request(server.httpServer)
-      .post('/graphql')
-      .send({
-        query: `
-          mutation {
-            register(input: {
-              email: "customer@e2e.com"
-              password: "Customer123!"
-              firstName: "Customer"
-              lastName: "User"
-            }) { token user { id } }
-          }
-        `,
-      });
-
-    // Login as customer
-    const resLogin = await request(server.httpServer)
-      .post('/graphql')
-      .send({
-        query: `
-          mutation {
-            login(email: "customer@e2e.com", password: "Customer123!") {
-              token
-            }
-          }
-        `,
-      });
-    const customerToken = resLogin.body.data.login.token;
-
     // Try to create product as customer (should fail)
     const res = await request(server.httpServer)
       .post('/graphql')

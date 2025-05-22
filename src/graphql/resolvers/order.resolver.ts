@@ -17,8 +17,13 @@ import {
 
 export const orderResolvers = {
   Query: {
-    orders: async (_: any, __: any, { user }: GraphQLContext) => {
+    orders: async (
+      _: any,
+      args: { skip?: number; take?: number },
+      { user, prisma }: GraphQLContext
+    ) => {
       if (!user) throw new AuthenticationError();
+      // Pass userId and isAdmin to getOrders
       return getOrders(user.userId, user.role === 'ADMIN');
     },
 
@@ -57,5 +62,61 @@ export const orderResolvers = {
         throw new AuthorizationError('Only admins can update order status');
       return updateOrderStatus(id, status);
     },
+  },
+};
+
+interface OrderItem {
+  productId: string;
+  quantity: number;
+  [key: string]: any;
+}
+
+interface OrderParent {
+  items: OrderItem[];
+  [key: string]: any;
+}
+
+interface ProductLoader {
+  load: (id: string) => Promise<any>;
+}
+
+interface OrderFieldContext {
+  productLoader: ProductLoader;
+  [key: string]: any;
+}
+
+interface OrderUserParent {
+  userId: string;
+  [key: string]: any;
+}
+
+interface UserLoader {
+  load: (id: string) => Promise<any>;
+}
+
+interface OrderUserFieldContext {
+  userLoader: UserLoader;
+  [key: string]: any;
+}
+
+export const Order = {
+  items: async (
+    parent: OrderParent,
+    args: Record<string, unknown>,
+    context: OrderFieldContext
+  ): Promise<Array<OrderItem & { product: any }>> => {
+    return Promise.all(
+      parent.items.map(async (item: OrderItem) => ({
+        ...item,
+        product: await context.productLoader.load(item.productId),
+      }))
+    );
+  },
+  user: async (
+    parent: OrderUserParent,
+    _: Record<string, unknown>,
+    context: OrderUserFieldContext
+  ): Promise<any> => {
+    return context.userLoader.load(parent.userId);
   },
 };

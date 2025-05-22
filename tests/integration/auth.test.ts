@@ -25,22 +25,11 @@ describe('Auth Integration', () => {
               lastName: "User"
             }) {
               token
-              user {
-                id
-                email
-                firstName
-                lastName
-                role
-              }
+              user { id email firstName lastName role }
             }
           }
         `
       });
-
-    if (res.body.errors) {
-      console.error('GraphQL Errors (register):', res.body.errors);
-    }
-
     expect(res.body.data?.register?.user?.email).toBe('testuser@example.com');
     expect(res.body.data?.register?.token).toBeDefined();
   });
@@ -53,20 +42,11 @@ describe('Auth Integration', () => {
           mutation {
             login(email: "testuser@example.com", password: "TestPassword123") {
               token
-              user {
-                id
-                email
-                role
-              }
+              user { id email role }
             }
           }
         `
       });
-
-    if (res.body.errors) {
-      console.error('GraphQL Errors (login):', res.body.errors);
-    }
-
     expect(res.body.data?.login?.user?.email).toBe('testuser@example.com');
     expect(res.body.data?.login?.token).toBeDefined();
   });

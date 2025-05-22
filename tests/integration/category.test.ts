@@ -70,11 +70,6 @@ describe('Category Integration', () => {
           }
         `
       });
-
-    if (res.body.errors) {
-      console.error('Create category errors:', res.body.errors);
-    }
-
     expect(res.body.data?.createCategory?.name).toBe('Cat1');
   });
 
@@ -91,11 +86,6 @@ describe('Category Integration', () => {
           }
         `
       });
-
-    if (res.body.errors) {
-      console.error('Query categories errors:', res.body.errors);
-    }
-
     expect(res.body.data?.categories.length).toBeGreaterThan(0);
   });
 });

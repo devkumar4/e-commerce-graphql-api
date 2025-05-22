@@ -14,8 +14,12 @@ import {
 
 export const productResolvers = {
   Query: {
-    products: async (_: any, args: any, context: GraphQLContext) => {
-      return getProducts(args, context.prisma);
+    products: async (_: any, args: { skip?: number; take?: number }, context: GraphQLContext) => {
+      const { skip, take, ...rest } = args;
+      return getProducts(
+        { ...rest, offset: skip, limit: take },
+        context.prisma
+      );
     },
 
     product: async (
@@ -63,5 +67,28 @@ export const productResolvers = {
 
       return deleteProduct(id, prisma);
     },
+  },
+};
+
+interface ProductParent {
+  categoryId: string;
+  [key: string]: any;
+}
+interface CategoryLoader {
+
+  load: (id: string) => Promise<any>;
+}
+
+interface ProductResolverContext extends GraphQLContext {
+  categoryLoader: CategoryLoader;
+}
+
+export const Product = {
+  category: async (
+    parent: ProductParent,
+    args: Record<string, unknown>,
+    context: ProductResolverContext
+  ): Promise<any> => {
+    return context.categoryLoader.load(parent.categoryId);
   },
 };
